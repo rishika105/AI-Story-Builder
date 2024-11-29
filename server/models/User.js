@@ -24,6 +24,9 @@ const mongoose = require("mongoose");
             type:String,
 
         },
+        resetPasswordToken: {
+            type: String, // For password reset process
+          },
         resetPasswordExpires: {
             type: Date,
         }
