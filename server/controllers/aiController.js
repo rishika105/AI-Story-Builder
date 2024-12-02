@@ -1,13 +1,7 @@
 const axios = require("axios");
 
-exports.genres = [
-  "Fantasy",
-  "Science-Fiction",
-  "Mystery",
-  "Horror",
-  "Comedy",
-  "Drama",
-];
+exports.genres = ["Fantasy", "Science-Fiction", "Mystery", "Horror", "Comedy", "Drama", "Thriller", "Rommance"];
+exports.wordLimit = ["small", "medium", "long"];
 
 exports.generatePrompt = async (req, res) => {
   const { currentStory, genre, wordLimit } = req.body;
@@ -19,46 +13,48 @@ exports.generatePrompt = async (req, res) => {
     });
   }
 
-  if (!exports.genres.includes(genre)) {
+  if (!this.genres.includes(genre)) {
     return res.status(400).json({
       success: false,
       message: "Invalid genre or not available",
     });
   }
 
-  const API_URL = "https://api-inference.huggingface.co/models/gpt2";
-  const API_KEY = process.env.HUGGINGFACE_API_KEY;
+  const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent";
+  const API_KEY = process.env.GEMINI_API_KEY;
 
   try {
     const response = await axios.post(
-      API_URL,
+      `${API_URL}?key=${API_KEY}`,
       {
-        inputs: `Continue this ${genre} story: ${currentStory}`,
-        parameters: { 
-          max_length: 50, // Reduced to handle token vs word limits
-          no_repeat_ngram_size: 2,
-          early_stopping: true,
-        },
+        contents: [
+          {
+            parts: [
+              {
+                text: `Continue this ${genre} story: ${currentStory} with this ${wordLimit} word limit only
+                .Keep it more Like Indian names and some indian inspirations lines of the ${genre}. Don't use very difficult words. Be a little simple`,
+              },
+            ],
+          },
+        ],
       },
       {
         headers: {
-          Authorization: `Bearer ${API_KEY}`,
+          "Content-Type": "application/json",
         },
       }
     );
 
-    console.log("Hugging Face Response:", response.data);
-
-    // Safely access and truncate text
-    const generatedText = response.data[0]?.generated_text || "No text generated.";
-    const truncatedText = generatedText.split(" ").slice(0, wordLimit).join(" ");
+    // Extract generated text
+    const generatedContent =
+      response.data?.candidates?.[0]?.content?.parts?.[0]?.text || "No content generated.";
 
     return res.status(200).json({
       success: true,
-      prompt: truncatedText,
+      prompt: generatedContent,
     });
   } catch (error) {
-    console.error("Error from Hugging Face API:", error.response?.data || error.message);
+    console.error("Error from Gemini API:", error.response?.data || error.message);
     return res.status(500).json({
       success: false,
       message: "Error generating prompt",
