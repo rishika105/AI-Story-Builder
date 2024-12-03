@@ -1,8 +1,9 @@
 const express = require("express");
 const { generatePrompt, genres } = require("../controllers/aiController");
 const router = express.Router();
+const {auth} = require("../middlewares/auth")
 
-router.post("/generate-prompt", generatePrompt);
+router.post("/generate-prompt", auth,  generatePrompt);
 router.get("/genres", (req, res) => res.status(200).json({ genres }));
 
 module.exports = router;
