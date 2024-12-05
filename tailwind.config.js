@@ -3,9 +3,7 @@ module.exports = {
   content: ["./src/**/*.{js,jsx,ts,tsx}"],
   theme: {
     fontFamily: {
-      sans: ["Poppins", "sans-serif"],
-      mono: ["Fira Code", "monospace"],
-      display: ["Oswald", "sans-serif"],
+      inter: ['Inter', 'sans-serif'], // Add Inter font
     },
     colors: {
       white: "#FFFFFF",
@@ -38,6 +36,18 @@ module.exports = {
         700: "#00081A",
         800: "#00040D",
         900: "#000204",
+      },
+      darkblue: {
+        50: 'rgb(24, 24, 36)',  // Lightest
+        100: 'rgb(20, 20, 30)',
+        200: 'rgb(16, 16, 24)',
+        300: 'rgb(12, 12, 18)',
+        400: 'rgb(8, 8, 16)',
+        500: 'rgb(3, 3, 14)',   // Base
+        600: 'rgb(2, 2, 10)',
+        700: 'rgb(1, 1, 8)',
+        800: 'rgb(1, 1, 6)',
+        900: 'rgb(0, 0, 4)'    // Darkest
       },
       limegreen: {
         5: "#F5FFE6",
