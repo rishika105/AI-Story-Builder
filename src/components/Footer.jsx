@@ -48,7 +48,7 @@ const Footer = () => {
         <div className="flex flex-col gap-2">
           <p className="text-darkgray-25 font-semibold">Contact Info</p>
           <a href="/">Email:support@storybuilder.com</a>
-          <a href="/">Phone: 7557558558</a>
+          <a href="/">Phone: 755755855X</a>
           <a href="/">
             Address: 123 Creativity Lane<br />
 
