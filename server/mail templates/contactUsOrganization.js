@@ -1,4 +1,4 @@
-exports.contactUsEmail = (
+exports.contactUsEmailSupport = (
     name, 
     email,
     message,
@@ -8,7 +8,7 @@ exports.contactUsEmail = (
     
     <head>
         <meta charset="UTF-8">
-        <title>Contact Form Confirmation</title>
+        <title>Contacting Support Team</title>
         <style>
             body {
                 background-color: #ffffff;
@@ -71,20 +71,18 @@ exports.contactUsEmail = (
     
     <body>
         <div class="container">
-            <div class="message">Contact Form Confirmation</div>
+            <div class="message">Contact Support Team</div>
             <div class="body">
-                <p>Dear ${name},</p>
-                <p>Thank you for contacting us. We have received your message and will respond to you as soon as possible.
+                <p>Dear Support Team,</p>
+                <p>
                 </p>
-                <p>Here are the details you provided:</p>
+                <p>This the message provided by the user and its details: </p>
                 <p>Name: ${name}</p>
                 <p>Email: ${email}</p>
                 <p>Message: ${message}</p>
-                <p>We appreciate your interest and will get back to you shortly. </p>
+                <p>Look through it and share appropriate reponses if neccassary.</p>
             </div>
-            <div class="support">If you have any further questions or need immediate assistance, please feel free to reach
-                out to us at <a href="mailto:info@studynotion.com">info@studynotion.com</a>. We are here to help!</div>
-        </div>
+            
     </body>
     
     </html>`

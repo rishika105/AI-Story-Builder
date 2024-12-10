@@ -6,7 +6,8 @@ const cors = require("cors");
 const dotenv = require("dotenv"); 
 const cookieParser = require("cookie-parser"); 
 const userRoutes = require("./routes/User"); 
-const aiRoutes = require("./routes/AI")
+const aiRoutes = require("./routes/AI");
+const contactRoute = require("./routes/Contact")
 const database = require("./config/database"); 
 
 // Load environment variables from `.env` file into `process.env`.
@@ -34,6 +35,7 @@ app.use(
 // Defining routes. with mounting defualt
 app.use("/api/v1/auth", userRoutes);
 app.use("/api/v1/ai", aiRoutes);
+app.use("/api/v1/reach", contactRoute);
 
 
 // This route confirms that the server is running.
