@@ -21,7 +21,7 @@ const Home = () => {
 
         <div className="h-[450px]">
           <Canvas>
-            <StarsBackground />
+            <StarsBackground count={10000} />
             <Earth />
           </Canvas>
         </div>

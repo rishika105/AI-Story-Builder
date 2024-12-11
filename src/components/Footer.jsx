@@ -20,15 +20,14 @@ const Footer = () => {
 
         <div className="flex flex-col gap-2">
           <p className="text-darkgray-25 font-semibold">Social Media</p>
-         <div className="flex gap-2">
-         <a href="/" className="flex">Facebook </a>
-
-         </div>
+          <div className="flex gap-2">
+            <a href="/" className="flex">
+              Facebook{" "}
+            </a>
+          </div>
           <a href="/">Instagram</a>
           <a href="/">Twitter</a>
           <a href="/">Linked In</a>
-
-     
         </div>
 
         <div className="flex flex-col gap-4">
@@ -50,23 +49,24 @@ const Footer = () => {
           <a href="/">Email:support@storybuilder.com</a>
           <a href="/">Phone: 755755855X</a>
           <a href="/">
-            Address: 123 Creativity Lane<br />
-
+            Address: 123 Creativity Lane
+            <br />
           </a>
           <div className="flex gap-2 mt-2">
-          <FaFacebook/>
-          <FaInstagram />
-          <FaTwitter />
-          <FaLinkedin />
+            <FaFacebook />
+            <FaInstagram />
+            <FaTwitter />
+            <FaLinkedin />
           </div>
         </div>
-        
       </div>
 
       <div className="w-[90%] h-[0.5px] bg-darkgray-100 opacity-20 justify-center items-center text-center mx-auto flex"></div>
 
       <div className="flex justify-between p-4 text-sm">
-        <div className="pl-10">© 2024 AI Story Builder. All rights reserved</div>
+        <div className="pl-10">
+          © 2024 AI Story Builder. All rights reserved
+        </div>
 
         <div className="pr-10"> Made with ❤️ Rishika</div>
       </div>
