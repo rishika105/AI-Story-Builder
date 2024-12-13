@@ -17,8 +17,10 @@ const ContactUsForm = () => {
 
   const submitContactForm = async (data) => {
     console.log("DATA", data);
+    const toastId = toast.loading("Loading...")
     try {
       setLoading(true);
+
       const response = await apiConnector(
         "POST",
         contactusEndpoint.CONTACT_US_API,
@@ -38,6 +40,7 @@ const ContactUsForm = () => {
       toast.error("Couldn't send your message");
     }
     setLoading(false);
+    toast.dismiss(toastId)
   };
 
   useEffect(() => {
