@@ -8,6 +8,7 @@ import Signup from "./pages/Signup";
 import ForgotPassword from "./pages/ForgotPassword";
 import UpdatePassword from "./pages/UpdatePassword";
 import VerifyEmail from "./pages/VerifyEmail";
+import AIStoryChatBot from "./pages/AIStoryChatBot";
 
 const App = () => {
   return (
@@ -17,9 +18,11 @@ const App = () => {
         <Route path="/login" element={<Login />}></Route>
         <Route path="/signup" element={<Signup />}></Route>
         <Route path="/forgot-password" element={<ForgotPassword />}></Route>
-        <Route path="/update-password" element={<UpdatePassword />}></Route>
+        <Route path="/update-password:id" element={<UpdatePassword />}></Route>
         <Route path="/verify-email" element={<VerifyEmail />}></Route>
+        <Route path="/story-chatbot" element={<AIStoryChatBot/>}></Route>
         <Route path="*" element={<Error />}></Route>
+     
       </Routes>
     </div>
   );
