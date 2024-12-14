@@ -2,7 +2,6 @@ import React from 'react'
 import { StarsBackground } from '../components/StarsBackground'
 import { Canvas } from '@react-three/fiber'
 import Footer from '../components/Footer'
-import errorImg from '../assets/images/error.png'
 import Navbar from '../components/Navbar'
 
 const Error = () => {

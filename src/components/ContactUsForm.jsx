@@ -10,14 +10,14 @@ const ContactUsForm = () => {
     register,
     handleSubmit,
     reset,
-    formState: { errors, isSubmitSuccessful },
+    formState: { isSubmitSuccessful },
   } = useForm();
 
   const [loading, setLoading] = useState(false);
 
   const submitContactForm = async (data) => {
     console.log("DATA", data);
-    const toastId = toast.loading("Loading...")
+    const toastId = toast.loading("Loading...");
     try {
       setLoading(true);
 
@@ -40,7 +40,7 @@ const ContactUsForm = () => {
       toast.error("Couldn't send your message");
     }
     setLoading(false);
-    toast.dismiss(toastId)
+    toast.dismiss(toastId);
   };
 
   useEffect(() => {
@@ -68,6 +68,7 @@ const ContactUsForm = () => {
               </label>
               <br></br>
               <input
+                required
                 type="text"
                 name="name"
                 id="name"
@@ -75,11 +76,6 @@ const ContactUsForm = () => {
                 {...register("name", { required: true })}
                 className="text-darkgray-50 bg-darkgray-800 bg-opacity-40 rounded-md px-2 py-3 border border-darkgray-300 border-opacity-20 mt-1 w-full"
               />
-              {errors.name && (
-                <span className="text-red-300 text-sm">
-                  *Please enter your name
-                </span>
-              )}
             </div>
             {/* email */}
             <div>
@@ -88,6 +84,7 @@ const ContactUsForm = () => {
               </label>
               <br></br>
               <input
+                required
                 type="text"
                 name="email"
                 id="email"
@@ -95,11 +92,6 @@ const ContactUsForm = () => {
                 {...register("email", { required: true })}
                 className="text-darkgray-50 bg-darkgray-800 bg-opacity-40 rounded-md px-2 py-3 border border-darkgray-300 border-opacity-20 mt-1 w-full"
               />
-              {errors.email && (
-                <span className="text-red-300 text-sm">
-                  *Please enter your email
-                </span>
-              )}
             </div>
 
             {/* message */}
@@ -107,6 +99,7 @@ const ContactUsForm = () => {
               Enter your Message
             </label>
             <textarea
+              required
               type="text"
               name="message"
               id="message"
@@ -116,11 +109,6 @@ const ContactUsForm = () => {
               {...register("message", { required: true })}
               className="text-darkgray-50 bg-darkgray-800 bg-opacity-40 rounded-md px-2 py-3 border border-darkgray-300 border-opacity-20 w-full"
             />
-            {errors.message && (
-              <span className="text-red-300 text-sm">
-                *Please enter your message
-              </span>
-            )}
 
             <button
               type="submit"
@@ -131,11 +119,11 @@ const ContactUsForm = () => {
           </div>
         </div>
       ) : (
-<>
-<div className="w-full h-[150px] bg-deepblue-800"></div>
-<div className="loader"></div>
-<div className="w-full h-[320px] bg-deepblue-800"></div>
-</>
+        <>
+          <div className="w-full h-[150px] bg-deepblue-800"></div>
+          <div className="loader"></div>
+          <div className="w-full h-[320px] bg-deepblue-800"></div>
+        </>
       )}
     </form>
   );

@@ -4,9 +4,9 @@ import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { setSignupData } from "../slices/authSlice";
 import { sendOtp } from "../services/operations/authAPI";
-import { useForm } from "react-hook-form";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai"
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -18,8 +18,6 @@ const Signup = () => {
     password: "",
     confirmPassword: "",
   });
-
-  const { errors } = useForm();
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -84,11 +82,6 @@ const Signup = () => {
                 placeholder="Enter your full name"
                 className="text-darkgray-50 bg-darkgray-800 bg-opacity-40 rounded-md px-2 py-3 border border-darkgray-300 border-opacity-20 mt-1 w-full"
               />
-              {errors?.name && (
-                <span className="text-red-300 text-sm">
-                  *Please enter your name
-                </span>
-              )}
             </div>
 
             {/* email */}
@@ -106,11 +99,6 @@ const Signup = () => {
                 placeholder="Enter your email"
                 className="text-darkgray-50 bg-darkgray-800 bg-opacity-40 rounded-md px-2 py-3 border border-darkgray-300 border-opacity-20 mt-1 w-full"
               />
-              {errors?.email && (
-                <span className="text-red-300 text-sm">
-                  *Please enter your email
-                </span>
-              )}
             </div>
 
             {/* password */}
@@ -121,18 +109,23 @@ const Signup = () => {
               <br></br>
               <input
                 required
-                type="text"
+                type= {showPassword ? "password" : "text"}
                 name="password"
                 value={password}
                 onChange={handleOnChange}
                 placeholder="Enter Password"
                 className="text-darkgray-50 bg-darkgray-800 bg-opacity-40 rounded-md px-2 py-3 border border-darkgray-300 border-opacity-20 mt-1 w-full"
               />
-              {errors?.password && (
-                <span className="text-red-300 text-sm">
-                  *Please enter your password
-                </span>
-              )}
+             <span
+             onClick={() => setShowPassword((prev) => !prev)}
+            className="absolute ml-[-30px] mt-5 cursor-pointer"
+             >
+             {
+                showPassword ? (
+                  <AiOutlineEyeInvisible fontSize={18} fill="#AFB2BF"/>
+                ) : <AiOutlineEye fontSize={18} fill="#AFB2BF"/>
+              }
+             </span>
             </div>
 
             {/* confirmPassword */}
@@ -143,20 +136,26 @@ const Signup = () => {
               <br></br>
               <input
                 required
-                type="text"
+                type= {showConfirmPassword ? "password" : "text"}
                 name="confirmPassword"
-                value={name}
+                value={confirmPassword}
                 onChange={handleOnChange}
                 placeholder="Enter Password again"
                 className="text-darkgray-50 bg-darkgray-800 bg-opacity-40 rounded-md px-2 py-3 border border-darkgray-300 border-opacity-20 mt-1 w-full"
               />
-              {errors?.confirmPassword && (
-                <span className="text-red-300 text-sm">
-                  *Please enter confirm Password
-                </span>
-              )}
-            </div>
+              <span
+              onClick={() => setShowConfirmPassword((prev) => !prev)}
+              className="absolute ml-[-30px] mt-5 cursor-pointer"
+              >
+                {
+                  showConfirmPassword ? 
+                  <AiOutlineEyeInvisible fontSize={18} fill="#AFB2BF"/> 
+                  : <AiOutlineEye fontSize={18} fill="#AFB2BF"/>
+                }
 
+              </span>
+            </div>
+             {/* submit */}
             <button
               type="submit"
               className="px-2 py-2 bg-darkgray-50 bg-opacity-80 mt-1 text-black font-semibold rounded-md"
@@ -164,7 +163,7 @@ const Signup = () => {
               Create Account
             </button>
             <p className="text-darkgray-50 text-sm justify-center flex gap-1">
-              Already have a account? <a href="/login">Login</a>
+              Already have a account? <a href="/login" className="text-darkgray-200">Login</a>
             </p>
           </div>
         </div>

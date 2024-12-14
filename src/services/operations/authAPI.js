@@ -58,7 +58,7 @@ export function signUp(name, email, password, confirmPassword, otp, navigate) {
     } catch (error) {
       console.log("SIGNUP API ERROR..............", error);
       toast.error("Signup failed");
-      navigate("/signup");
+      navigate("/verify-email");
     }
     dispatch(setLoading(false));
     toast.dismiss(toastId);

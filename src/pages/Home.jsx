@@ -1,7 +1,6 @@
 import React from "react";
 import { Earth } from "../components/Earth";
 import { Canvas } from "@react-three/fiber";
-import { Stars } from "@react-three/drei";
 import Footer from "../components/Footer";
 import ContactUsForm from "../components/ContactUsForm";
 import Navbar from "../components/Navbar";
