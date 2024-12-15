@@ -31,7 +31,7 @@ const VerifyEmail = () => {
 
   return (
     <>
-    <Navbar/>
+      <Navbar />
       <form
         onSubmit={handleVerifyAndSignup}
         className="flex justify-center items-center pt-[80px] bg-deepblue-800 p-[100px]"
@@ -44,7 +44,6 @@ const VerifyEmail = () => {
             A verification code has been sent to your email. Enter that code
             below.
           </p>
-
           <OTPInput
             value={otp}
             onChange={setOtp}
@@ -70,12 +69,12 @@ const VerifyEmail = () => {
             className="px-2 py-2 border bg-darkgray-800 bg-opacity-40 border-darkgray-300 border-opacity-20 text-white font-semibold rounded-md w-[95%] mt-9"
           >
             Verify Email
-          </button> 
+          </button>
           <div className="flex justify-between mt-3 text-darkgray-50 text-sm gap-[180px]">
             <Link to="/signup">
               <p className="flex gap-1">
                 <BiArrowBack className="mt-1" /> Back to signup
-              </p> 
+              </p>
             </Link>
 
             <button
@@ -87,7 +86,7 @@ const VerifyEmail = () => {
           </div>
         </div>
       </form>
-      <Footer/>
+      <Footer />
     </>
   );
 };
