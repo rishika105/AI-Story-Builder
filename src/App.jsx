@@ -9,18 +9,43 @@ import ForgotPassword from "./pages/ForgotPassword";
 import UpdatePassword from "./pages/UpdatePassword";
 import VerifyEmail from "./pages/VerifyEmail";
 import AIStoryChatBot from "./pages/AIStoryChatBot";
+import Genres from "./pages/Genres";
+import PrivateRoute from "./components/PrivateRoute";
 
 const App = () => {
   return (
     <div>
       <Routes>
-        <Route path="/" element={<Home />}></Route>
-        <Route path="/login" element={<Login />}></Route>
-        <Route path="/signup" element={<Signup />}></Route>
-        <Route path="/forgot-password" element={<ForgotPassword />}></Route>
-        <Route path="/update-password/:id" element={<UpdatePassword />}></Route>
-        <Route path="/verify-email" element={<VerifyEmail />}></Route>
-        <Route path="/story-chatbot" element={<AIStoryChatBot />}></Route>
+        <Route path="/" element={<Home />} />
+
+        <Route path="/login" element={<Login />} />
+
+        <Route path="/signup" element={<Signup />} />
+
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+
+        <Route path="/update-password/:id" element={<UpdatePassword />} />
+
+        <Route path="/verify-email" element={<VerifyEmail />} />
+
+        <Route
+          path="/story-chatbot"
+          element={
+            <PrivateRoute>
+              <AIStoryChatBot />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/genres"
+          element={
+            <PrivateRoute>
+              <Genres />
+            </PrivateRoute>
+          }
+        ></Route>
+        
         <Route path="*" element={<Error />}></Route>
       </Routes>
     </div>

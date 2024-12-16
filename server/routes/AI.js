@@ -4,6 +4,6 @@ const router = express.Router();
 const {auth} = require("../middlewares/auth")
 
 router.post("/generate-prompt", auth,  generatePrompt);
-router.get("/genres", (req, res) => res.status(200).json({ genres }));
+router.get("/genres", auth, (req, res) => res.status(200).json({ genres }));
 
 module.exports = router;

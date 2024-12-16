@@ -1,7 +1,9 @@
 import React from "react";
 import { TbCircleLetterAFilled, TbHexagonLetterI } from "react-icons/tb";
+import { useSelector } from "react-redux";
 
 const Navbar = () => {
+  const { token } = useSelector((state) => state.auth);
   return (
     <>
       <div className="bg-deepblue-800 w-full h-[70px] flex relative justify-between">
@@ -11,22 +13,36 @@ const Navbar = () => {
         >
           <TbCircleLetterAFilled className=" text-2xl" />{" "}
           <TbHexagonLetterI className=" text-2xl" />
-         <span className="mt-[-2px]"> &nbsp;Story Builder</span>
+          <span className="mt-[-2px]"> &nbsp;Story Builder</span>
         </a>
 
         <div className="flex gap-2 text-white mr-12">
-          <a
-            href="/login"
-            className="w-[95px] h-[45px] mt-3 border border-darkgray-300 border-opacity-20 rounded-md flex bg-darkgray-400 bg-opacity-20 text-darkgray-50 font-medium pt-2  pl-6"
-          >
-           <span> Login</span>
-          </a>
-          <a
-            href="/signup"
-            className="w-[95px] h-[45px] mt-3 border border-darkgray-300 border-opacity-20 rounded-md flex bg-darkgray-400 bg-opacity-20 text-darkgray-50 font-medium pt-2  pl-5"
-          >
-            Sign up
-          </a>
+          {token == null && (
+            <a
+              href="/login"
+              className="w-[95px] h-[45px] mt-3 border border-darkgray-300 border-opacity-20 rounded-md flex bg-darkgray-400 bg-opacity-20 text-darkgray-50 font-medium pt-2  pl-6"
+            >
+              <span> Login</span>
+            </a>
+          )}
+          {token == null && (
+            <a
+              href="/signup"
+              className="w-[95px] h-[45px] mt-3 border border-darkgray-300 border-opacity-20 rounded-md flex bg-darkgray-400 bg-opacity-20 text-darkgray-50 font-medium pt-2  pl-5"
+            >
+              Sign up
+            </a>
+          )}
+          {
+            token != null && (
+              <a
+              href="/signup"
+              className="w-[95px] h-[45px] mt-3 border border-darkgray-300 border-opacity-20 rounded-md flex bg-darkgray-400 bg-opacity-20 text-darkgray-50 font-medium pt-2  pl-5"
+            >
+              Log out
+            </a>
+            ) 
+          }
         </div>
       </div>
 

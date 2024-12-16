@@ -14,3 +14,9 @@ export const endpoints = {
   RESETPASSTOKEN_API: BASE_URL + "/auth/reset-password-token",
   RESETPASSWORD_API: BASE_URL + "/auth/reset-password",
 }
+
+//STORY AI ENDPOINTS
+export const AIendpoints = {
+  GENRES_API: BASE_URL + "/ai/genres",
+  GENERATE_STORY_AI_API: BASE_URL + "/ai/generate-prompt"
+}
