@@ -15,6 +15,8 @@ const ContactUsForm = () => {
 
   const [loading, setLoading] = useState(false);
 
+
+
   const submitContactForm = async (data) => {
     console.log("DATA", data);
     const toastId = toast.loading("Loading...");
@@ -44,18 +46,18 @@ const ContactUsForm = () => {
   };
 
   useEffect(() => {
-    if (!isSubmitSuccessful) {
+    if (!isSubmitSuccessful || loading) {
       reset({
         name: "",
         email: "",
         message: "",
       });
     }
-  }, [reset, isSubmitSuccessful]);
+  }, [reset, isSubmitSuccessful, loading]);
 
   return (
     <form onSubmit={handleSubmit(submitContactForm)}>
-      {!loading ? (
+      {
         <div className="border border-darkgray-300 rounded-md p-11 border-opacity-20">
           <h1 className="text-darkgray-5 text-2xl p-3 flex justify-center mb-3">
             Contact Us
@@ -118,13 +120,7 @@ const ContactUsForm = () => {
             </button>
           </div>
         </div>
-      ) : (
-        <>
-          <div className="w-full h-[150px] bg-deepblue-800"></div>
-          <div className="loader"></div>
-          <div className="w-full h-[320px] bg-deepblue-800"></div>
-        </>
-      )}
+      }
     </form>
   );
 };
