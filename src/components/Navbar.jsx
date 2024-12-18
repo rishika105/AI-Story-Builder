@@ -67,10 +67,10 @@ const Navbar = () => {
       {showConfirmationModel ? (
         <div className="absolute inset-0 flex items-center justify-center z-10">
           {/* Blur Effect on Background Only */}
-          <div className="absolute inset-0 backdrop-filter backdrop-blur-sm bg-black bg-opacity-20"></div>
+          <div className="absolute inset-0 backdrop-filter backdrop-blur-sm bg-darkgray-200 bg-opacity-10"></div>
 
           {/* Modal Content */}
-          <div className="relative w-[350px] h-[180px] mt-3 border border-darkgray-300 border-opacity-20 rounded-md flex bg-darkgray-700 text-darkgray-50 font-medium pt-2 pl-6 z-30">
+          <div className="relative w-[350px] h-[170px] mt-3 border border-darkgray-300 border-opacity-20 rounded-md flex bg-deepblue-800 text-darkgray-50 font-medium pt-2 pl-6 z-30">
             <div>
               <div className="flex ml-2 p-2 pt-2 text-lg">
                 Are you sure you want to Logout?

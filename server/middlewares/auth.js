@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
-const User = require("../models/User");
+
 // Configuring dotenv to load environment variables from .env file
 dotenv.config();
 
@@ -11,7 +11,7 @@ exports.auth = async (req, res, next) => {
       req.cookies.token ||
       req.body.token ||
       req.header("Authorization").replace("Bearer ", "");
-
+      
     //if jwt missing
     if (!token) {
       return res.status(401).json({
@@ -35,6 +35,7 @@ exports.auth = async (req, res, next) => {
 
     //if jwt is valid move to the next middleware or request handler
     next();
+    console.log("middleware is passed");
   } catch (error) {
     return res.status(401).json({
       success: false,

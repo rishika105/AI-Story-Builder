@@ -20,7 +20,7 @@ const Signup = () => {
   });
 
   const [showPassword, setShowPassword] = useState(true);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(true);
 
   const { name, email, password, confirmPassword } = formData;
 

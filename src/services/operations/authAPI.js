@@ -101,7 +101,7 @@ export function logout(navigate) {
     dispatch(setToken(null));
     localStorage.removeItem("token");
     toast.success("Logged Out");
-    navigate("/login");
+    navigate("/home");
   };
 }
 
