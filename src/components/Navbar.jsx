@@ -3,12 +3,14 @@ import { TbCircleLetterAFilled, TbHexagonLetterI } from "react-icons/tb";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../services/operations/authAPI";
 import { useNavigate } from "react-router-dom";
+import { IoPersonCircleOutline } from "react-icons/io5";
 
 const Navbar = () => {
   const { token } = useSelector((state) => state.auth);
   const [showConfirmationModel, setShowConfirmationModel] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [showModal , setShowModal] = useState(false);
 
   // Prevent scrolling when confirmation modal is shown
   useEffect(() => {
@@ -52,18 +54,33 @@ const Navbar = () => {
               Sign up
             </a>
           )}
-          {token != null && (
-            <button
+
+          {
+            token != null && 
+            (
+              <div className="text-3xl mt-5 mr-4 text-darkgray-200 cursor-pointer" onClick={() => setShowModal(true)}>  <IoPersonCircleOutline/></div>
+            )
+          }
+        </div>
+
+        {
+        showModal ? (<div className="bg-darkblue-300 absolute h-[500px] w-[400px]">
+             <button
               onClick={() => setShowConfirmationModel(true)}
               className="w-[95px] h-[45px] mt-3 border border-darkgray-300 border-opacity-20 rounded-md flex bg-darkgray-400 bg-opacity-20 text-darkgray-50 font-medium pt-2 pl-5"
             >
               Log out
             </button>
-          )}
-        </div>
-      </div>
+          
+        </div>) : (<div></div>)
+      }
 
-      <div className="opacity-20 bg-darkgray-300 w-full h-[0.05rem]"></div>
+      </div>
+   
+    
+
+      <div className="opacity-20 bg-darkgray-300 w-full h-[0.05rem] relative"></div>
+
       {showConfirmationModel ? (
         <div className="absolute inset-0 flex items-center justify-center z-10">
           {/* Blur Effect on Background Only */}
@@ -98,6 +115,8 @@ const Navbar = () => {
       ) : (
         <div></div>
       )}
+
+
     </>
   );
 };

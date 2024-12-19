@@ -5,8 +5,13 @@ import Footer from "../components/Footer";
 import ContactUsForm from "../components/ContactUsForm";
 import Navbar from "../components/Navbar";
 import { StarsBackground } from "../components/StarsBackground";
+import { useSelector } from "react-redux";
+import { IoMdArrowRoundForward } from "react-icons/io";
+import { motion } from "framer-motion";
 
 const Home = () => {
+  const { token } = useSelector((state) => state.auth);
+
   return (
     <>
       <Navbar />
@@ -64,6 +69,27 @@ const Home = () => {
 
         <div className="flex justify-center items-center p-10">
           <ContactUsForm />
+        </div>
+      </div>
+
+      <div className="h-full w-full bg-deepblue-800 relative p-[130px] pb-[160px]">
+        <div className="relative z-10 text-[140px] text-darkgray-400 opacity-20 font-bold ml-34 text-center justify-center flex items-center">
+          LET'S BUILD STORIES
+        </div>
+
+        <p className="absolute z-20 text-white text-[60px] mt-[-350px] ml-[180px] font-semibold">
+          Start with a single line!
+        </p>
+
+        <div className="h-[130px] w-[130px] rounded-full text-black font-semibold bg-darkgray-400  relative z-30 mt-[-160px] ml-[460px]">
+          <a
+            className="text-[23px] w-[80%] absolute mt-6 ml-8 cursor-pointer z-20 "
+            href={token == null ? "/signup" : "/genres"}
+          >
+            {" "}
+            Pick a genre
+          </a>
+          <IoMdArrowRoundForward className="absolute z-30 mt-[94px] ml-[50px] font-bold text-2xl" />
         </div>
       </div>
 
