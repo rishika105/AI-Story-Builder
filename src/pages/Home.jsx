@@ -7,7 +7,7 @@ import Navbar from "../components/Navbar";
 import { StarsBackground } from "../components/StarsBackground";
 import { useSelector } from "react-redux";
 import { IoMdArrowRoundForward } from "react-icons/io";
-import { motion } from "framer-motion";
+// import { motion } from "framer-motion";
 
 const Home = () => {
   const { token } = useSelector((state) => state.auth);

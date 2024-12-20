@@ -1,92 +1,81 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { TbCircleLetterAFilled, TbHexagonLetterI } from "react-icons/tb";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../services/operations/authAPI";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { IoPersonCircleOutline } from "react-icons/io5";
+import useOnClickOutside from "../hooks/useOnClickOutside";
 
 const Navbar = () => {
   const { token } = useSelector((state) => state.auth);
   const [showConfirmationModel, setShowConfirmationModel] = useState(false);
+  const [showModal, setShowModal] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [showModal , setShowModal] = useState(false);
+  const ref = useRef(null);
+
+  // Close modal when clicking outside
+  useOnClickOutside(ref, () => setShowModal(false));
 
   // Prevent scrolling when confirmation modal is shown
   useEffect(() => {
-    if (showConfirmationModel) {
-      document.body.style.overflow = "hidden"; // Disable scrolling
-    } else {
-      document.body.style.overflow = "auto"; // Re-enable scrolling
-    }
-  });
+    document.body.style.overflow = showConfirmationModel ? "hidden" : "auto";
+  }, [showConfirmationModel]);
 
   function handleLogout() {
+    setShowModal(false);
     dispatch(logout(navigate));
   }
+
 
   return (
     <>
       <div className="bg-deepblue-800 w-full h-[70px] flex relative justify-between">
         <a
           href="/"
-          className="text-white font-semibold  flex pt-6 pl-8 gap-[0.3px] text-lg"
+          className="text-white font-semibold flex pt-6 pl-8 gap-[0.3px] text-lg"
         >
-          <TbCircleLetterAFilled className=" text-2xl" />{" "}
-          <TbHexagonLetterI className=" text-2xl" />
+          <TbCircleLetterAFilled className="text-2xl" />
+          <TbHexagonLetterI className="text-2xl" />
           <span className="mt-[-2px]"> &nbsp;Story Builder</span>
         </a>
 
         <div className="flex gap-2 text-white mr-12">
-          {token == null && (
-            <a
-              href="/login"
-              className="w-[95px] h-[45px] mt-3 border border-darkgray-300 border-opacity-20 rounded-md flex bg-darkgray-400 bg-opacity-20 text-darkgray-50 font-medium pt-2  pl-6"
+          {token == null ? (
+            <>
+              <a
+                href="/login"
+                className="w-[95px] h-[45px] mt-3 border border-darkgray-300 border-opacity-20 rounded-md flex bg-darkgray-400 bg-opacity-20 text-darkgray-50 font-medium pt-2 pl-6"
+              >
+                <span>Login</span>
+              </a>
+              <a
+                href="/signup"
+                className="w-[95px] h-[45px] mt-3 border border-darkgray-300 border-opacity-20 rounded-md flex bg-darkgray-400 bg-opacity-20 text-darkgray-50 font-medium pt-2 pl-5"
+              >
+                Sign up
+              </a>
+            </>
+          ) : (
+            <div
+              className="text-3xl mt-5 mr-4 text-darkgray-200 cursor-pointer"
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowModal((prev) => !prev);
+              }}
             >
-              <span> Login</span>
-            </a>
+              <IoPersonCircleOutline />
+            </div>
           )}
-          {token == null && (
-            <a
-              href="/signup"
-              className="w-[95px] h-[45px] mt-3 border border-darkgray-300 border-opacity-20 rounded-md flex bg-darkgray-400 bg-opacity-20 text-darkgray-50 font-medium pt-2  pl-5"
-            >
-              Sign up
-            </a>
-          )}
-
-          {
-            token != null && 
-            (
-              <div className="text-3xl mt-5 mr-4 text-darkgray-200 cursor-pointer" onClick={() => setShowModal(true)}>  <IoPersonCircleOutline/></div>
-            )
-          }
         </div>
-
-        {
-        showModal ? (<div className="bg-darkblue-300 absolute h-[500px] w-[400px]">
-             <button
-              onClick={() => setShowConfirmationModel(true)}
-              className="w-[95px] h-[45px] mt-3 border border-darkgray-300 border-opacity-20 rounded-md flex bg-darkgray-400 bg-opacity-20 text-darkgray-50 font-medium pt-2 pl-5"
-            >
-              Log out
-            </button>
-          
-        </div>) : (<div></div>)
-      }
-
       </div>
-   
-    
 
       <div className="opacity-20 bg-darkgray-300 w-full h-[0.05rem] relative"></div>
 
-      {showConfirmationModel ? (
+      {/* Confirmation Modal */}
+      {showConfirmationModel && (
         <div className="absolute inset-0 flex items-center justify-center z-10">
-          {/* Blur Effect on Background Only */}
           <div className="absolute inset-0 backdrop-filter backdrop-blur-sm bg-darkgray-200 bg-opacity-10"></div>
-
-          {/* Modal Content */}
           <div className="relative w-[350px] h-[170px] mt-3 border border-darkgray-300 border-opacity-20 rounded-md flex bg-deepblue-800 text-darkgray-50 font-medium pt-2 pl-6 z-30">
             <div>
               <div className="flex ml-2 p-2 pt-2 text-lg">
@@ -112,11 +101,32 @@ const Navbar = () => {
             </div>
           </div>
         </div>
-      ) : (
-        <div></div>
       )}
 
+      {/* Dropdown Modal */}
+      {showModal && !showConfirmationModel && (
+      <div>
+          <div class="w-[20px] h-[20px] right-12 mr-6 top-12 bg-darkgray-800 triangle absolute z-30" ></div>
+        <div
+          ref={ref}
+          className="bg-darkblue-300 absolute z-30 h-[100px] w-[140px] rounded-sm border border-darkgray-500 border-opacity-20 justify-end flex flex-col ml-[300px] right-4 top-12 mt-4"
+        >
 
+          <Link to="/genres">
+            <button className="w-[145px] h-[50%] text-darkgray-50 font-medium ml-[-5px]">
+              Start playing
+            </button>
+            <div className="h-[0.025rem] bg-opacity-20 bg-darkgray-100 mt-3"></div>
+          </Link>
+          <button
+            onClick={() => setShowConfirmationModel(true)}
+            className="w-full h-[50%] text-darkgray-50 font-medium ml-[-10px]"
+          >
+            Log out
+          </button>
+        </div>
+      </div>
+      )}
     </>
   );
 };
