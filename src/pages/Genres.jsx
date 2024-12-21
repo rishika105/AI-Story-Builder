@@ -1,12 +1,23 @@
 import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { getGenres } from "../services/operations/aiAPI";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import { setGenre } from "../slices/genreSlice";
+import { useNavigate } from "react-router-dom";
 
 const Genres = () => {
   const { token } = useSelector((state) => state.auth);
   const [genres, setGenres] = useState([]);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  function handleSelectGenre(genre) {
+    // console.log("IN SELECT GENRE");
+    dispatch(setGenre(genre)); //dispatch action store in store
+    console.log(genre);
+    navigate("/story-chatbot");
+  }
 
   const getGenre = async () => {
     try {
@@ -34,7 +45,9 @@ const Genres = () => {
           {genres.map((genre, index) => (
             <button
               key={index}
+              onClick={() => handleSelectGenre(genre)}
               className="p-6 rounded-md shadow-lg h-[150px]
+              
                 transition-colors duration-200 cursor-pointer bg-darkgray-400 bg-opacity-20 border border-darkgray-300 border-opacity-20"
             >
               <h2 className="text-white text-xl font-medium">{genre}</h2>
