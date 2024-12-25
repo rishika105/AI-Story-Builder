@@ -1,24 +1,35 @@
-import React from "react";
+import React, { useState } from "react";
 import Navbar from "../components/Navbar";
 
 const AIStoryChatBot = () => {
+  const [message, setMessage] = useState("");
+
+  // Adjust the height dynamically based on content
+  const handleInput = (e) => {
+    e.target.style.height = "60px"; // Reset to initial height
+    e.target.style.height = `${e.target.scrollHeight}px`; // Adjust height based on content
+    setMessage(e.target.value); // Update message state
+  };
+
   return (
     <>
       <Navbar />
-      <div className="bg-deepblue-600 flex relative justify-center items-center mx-auto w-[70%] h-[90vh]">
-        {/* chat section */}
-       <div className=" overflow-y overflow-auto h-[40%]">
+      <div className="bg-deepblue-800 flex flex-col justify-between mx-auto w-[70%] h-[560px] p-4">
+        {/* Chat section */}
+        <div className="overflow-y-scroll space-y-4 h-full scrollbar-hide">
+          {/* Messages go here */}
+          <p className="text-white">Welcome to the chat!</p>
+          
+        </div>
 
-       </div>
-      
-        {/* send message */}
-        <input
-          className="bg-darkgray-400 bg-opacity-20 h-[65px] w-[70%] rounded-md bottom-0 flex absolute pl-4 text-white focus:outline-none mb-[-300px]"
+        {/* Send message */}
+        <textarea
+          className="bg-darkgray-400 bg-opacity-20 min-h-[60px] w-[80%] mx-auto rounded-2xl p-4 text-white focus:outline-none resize-none overflow-y-scroll scrollbar-hide mt-4"
           placeholder="Send message"
-        ></input>
-    
+          value={message}
+          onInput={handleInput}
+        />
       </div>
-   
     </>
   );
 };
