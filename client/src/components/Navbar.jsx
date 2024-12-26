@@ -24,7 +24,9 @@ const Navbar = () => {
 
   function handleLogout() {
     setShowModal(false);
-    dispatch(logout(navigate));
+    dispatch(logout());
+    setShowConfirmationModel(false);
+    navigate("/");
   }
 
 
@@ -94,6 +96,7 @@ const Navbar = () => {
                 <button
                   className="px-4 py-2 bg-darkgray-50 bg-opacity-80 mt-1 text-black font-semibold rounded-md"
                   onClick={() => setShowConfirmationModel(false)}
+
                 >
                   Cancel
                 </button>

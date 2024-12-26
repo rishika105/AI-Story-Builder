@@ -96,12 +96,11 @@ export function login(email, password, navigate) {
   };
 }
 
-export function logout(navigate) {
+export function logout() {
   return (dispatch) => {
     dispatch(setToken(null));
     localStorage.removeItem("token");
     toast.success("Logged Out");
-    navigate("/");
   };
 }
 

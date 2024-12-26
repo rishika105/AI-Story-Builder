@@ -15,7 +15,6 @@ const Home = () => {
   return (
     <>
       <Navbar />
-
       <div className="bg-deepblue-800 relative">
         <div className="flex flex-col justify-center items-center p-4">
           <p className=" mt-2 mb-3 text-lg border border-darkgray-300 border-opacity-20  flex bg-darkgray-400 bg-opacity-20 text-darkgray-5 font-medium px-6 py-2 rounded-full">
