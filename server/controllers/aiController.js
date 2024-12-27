@@ -12,7 +12,6 @@ exports.generatePrompt = async (req, res) => {
       message: "Missing required fields",
     });
   }
-
   if (!this.genres.includes(genre)) {
     return res.status(400).json({
       success: false,

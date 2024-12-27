@@ -19,12 +19,11 @@ const AIStoryChatBot = () => {
         <div className="overflow-y-scroll space-y-4 h-full scrollbar-hide">
           {/* Messages go here */}
           <p className="text-white">Welcome to the chat!</p>
-          
         </div>
 
         {/* Send message */}
         <textarea
-          className="bg-darkgray-400 bg-opacity-20 min-h-[60px] w-[80%] mx-auto rounded-2xl p-4 text-white focus:outline-none resize-none overflow-y-scroll scrollbar-hide mt-4"
+          className="bg-darkgray-400 bg-opacity-20 h-[60px] w-[80%] mx-auto rounded-2xl p-4 text-white focus:outline-none resize-none overflow-y-scroll scrollbar-hide mt-4 placeholder:pb-2"
           placeholder="Send message"
           value={message}
           onInput={handleInput}
