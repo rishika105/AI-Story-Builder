@@ -30,23 +30,24 @@ export const getGenres = async (token) => {
 export const genPrompt = async (userId, newInput, genre, token) => {
   const toastId = toast.loading("Generating story...");
   try {
-    
-    const response = await apiConnector("POST", GENERATE_STORY_AI_API, {
-      userId,
-      newInput,
-      genre,
-      Authorization: `Bearer ${token}`,
-    });
+    const response = await apiConnector(
+      "POST",
+      GENERATE_STORY_AI_API,
+      { userId, newInput, genre }, // Body of the request
+      {
+        Authorization: `Bearer ${token}`, // Pass the token in headers
+      }
+    );
 
     if (!response.data.success) {
-      throw new Error(response.data.message);
+      throw new Error(response.data.message || "Story generation failed");
     }
 
     toast.success("Story generated successfully");
-    return response.data;
+    return response.data; // Return the full response
   } catch (error) {
     console.error("Error generating story prompt:", error);
-    toast.error("Failed to generate story prompt");
+    toast.error(error.message || "Failed to generate story prompt");
     return null;
   } finally {
     toast.dismiss(toastId);

@@ -1,15 +1,15 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  genre: null,
+  genre: null, // Initial value for genre
 };
 
 const genreSlice = createSlice({
   name: "genre",
   initialState: initialState,
   reducers: {
-    setGenre(state, value) {
-      state.genre = value.payload;
+    setGenre(state, action) {
+      state.genre = action.payload; // Access payload from the dispatched action
     },
   },
 });

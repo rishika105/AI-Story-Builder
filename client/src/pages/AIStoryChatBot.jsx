@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import Navbar from "../components/Navbar";
 import { useSelector } from "react-redux";
 import { genPrompt } from "../services/operations/aiAPI";
@@ -8,6 +8,7 @@ import { FaCircleArrowUp } from "react-icons/fa6";
 const AIStoryChatBot = () => {
   const [message, setMessage] = useState("");
   const {token} = useSelector((state) => state.auth);
+  const textareaRef = useRef(null); // Reference for the textarea
 
   // Adjust the height dynamically based on content
   const handleInput = (e) => {
@@ -23,20 +24,34 @@ const AIStoryChatBot = () => {
   const genre = useSelector((state) => state.genre);
 
   const handleSend = async () => {
+    
     if (message.trim() === "") return;
 
     const userMessage = { text: message, isBot: false };
     setMessages([...messages, userMessage]);
     setMessage("");
 
+     // Reset the textarea size to its original height
+     if (textareaRef.current) {
+      textareaRef.current.style.height = "60px";
+    }
+
     const response = await genPrompt(null, message, genre, token);
+
 
     if (response) {
       const botMessage = { text: response.story, isBot: true };
       setMessages((prevMessages) => [...prevMessages, userMessage, botMessage]);
     }
-  };
 
+    
+  };
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault(); // Prevent new line
+      handleSend(); // Trigger the send function
+    }
+  };
   return (
     <>
       <Navbar />
@@ -56,12 +71,14 @@ const AIStoryChatBot = () => {
         {/* Send message */}
         <div className="flex">
           <textarea
-            className="bg-darkgray-400 bg-opacity-20 h-[60px] w-[80%] mx-auto rounded-2xl p-4 text-white focus:outline-none resize-none overflow-y-scroll relative scrollbar-hide mt-4 placeholder:pb-2"
+            ref={textareaRef} 
+            className="bg-darkgray-400 bg-opacity-20 h-[60px] w-[80%] mx-auto rounded-2xl p-4 text-white focus:outline-none max-h-[200px] resize-none overflow-y-scroll relative scrollbar-hide mt-4 placeholder:pb-2"
             placeholder="Send message"
             value={message}
             onInput={handleInput}
+            onKeyDown={handleKeyDown} // Listen for keydown events
           />
-          <button className="absolute right-80 mt-8 p-1 pr-2 " onClick={handleSend}>
+          <button className="absolute right-80 mt-8 p-1 pr-2 " type="submit" onClick={handleSend}>
             {" "}
             <FaCircleArrowUp className="text-2xl rounded-full text-darkgray-50 cursor-pointer" />
           </button>
