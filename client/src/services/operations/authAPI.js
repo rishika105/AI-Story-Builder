@@ -1,5 +1,5 @@
 import { toast } from "react-hot-toast";
-import { setLoading, setToken } from "../../slices/authSlice";
+import { setLoading, setToken, setUserId } from "../../slices/authSlice";
 import { apiConnector } from "../apiconnector";
 import { endpoints } from "../api";
 
@@ -19,7 +19,7 @@ export function sendOtp(email, navigate) {
       const response = await apiConnector("POST", SENDOTP_API, { email });
       console.log("SEND API RESPONSE......", response);
 
-      console.log(response.data.success);
+      // console.log(response.data.success);
 
       if (!response.data.success) {
         throw new Error(response.data.messaage);
@@ -83,8 +83,11 @@ export function login(email, password, navigate) {
 
       toast.success("Login Successful");
       dispatch(setToken(response.data.token));
+      dispatch(setUserId(response.data.user.id));
 
       localStorage.setItem("token", JSON.stringify(response.data.token));
+      console.log("USER ID:", response.data.user.id);
+      localStorage.setItem("userId", JSON.stringify(response.data.user.id));
 
       navigate("/genres");
     } catch (error) {
@@ -100,6 +103,7 @@ export function logout() {
   return (dispatch) => {
     dispatch(setToken(null));
     localStorage.removeItem("token");
+    localStorage.removeItem("userId");
     toast.success("Logged Out");
   };
 }

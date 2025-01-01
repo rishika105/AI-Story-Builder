@@ -2,12 +2,13 @@ import React, { useRef, useState } from "react";
 import Navbar from "../components/Navbar";
 import { useSelector } from "react-redux";
 import { genPrompt } from "../services/operations/aiAPI";
-import { IoArrowUpCircle } from "react-icons/io5";
 import { FaCircleArrowUp } from "react-icons/fa6";
 
 const AIStoryChatBot = () => {
   const [message, setMessage] = useState("");
   const {token} = useSelector((state) => state.auth);
+  const genre = useSelector((state) => state.genre);
+  const {userId} = useSelector((state => state.auth));
   const textareaRef = useRef(null); // Reference for the textarea
 
   // Adjust the height dynamically based on content
@@ -21,7 +22,6 @@ const AIStoryChatBot = () => {
     { text: "Welcome to the chat!", isBot: true },
   ]);
 
-  const genre = useSelector((state) => state.genre);
 
   const handleSend = async () => {
     
@@ -35,16 +35,14 @@ const AIStoryChatBot = () => {
      if (textareaRef.current) {
       textareaRef.current.style.height = "60px";
     }
+    console.log("GENRE", genre.genre)
 
-    const response = await genPrompt(null, message, genre, token);
-
+    const response = await genPrompt(userId, message, genre.genre, token);
 
     if (response) {
       const botMessage = { text: response.story, isBot: true };
       setMessages((prevMessages) => [...prevMessages, userMessage, botMessage]);
     }
-
-    
   };
   const handleKeyDown = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {

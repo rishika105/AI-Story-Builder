@@ -13,7 +13,7 @@ const Genres = () => {
   const navigate = useNavigate();
 
   function handleSelectGenre(genre) {
-    console.log("IN SELECT GENRE");
+    // console.log("IN SELECT GENRE");
     dispatch(setGenre(genre)); //dispatch action store in store
     console.log(genre);
     navigate("/story-chatbot");
@@ -30,8 +30,8 @@ const Genres = () => {
   };
 
   useEffect(() => {
-    getGenre()
-  }, []);   // eslint-disable react-hooks/exhaustive-deps
+    getGenre();
+  }, []); //first render
 
   return (
     <>

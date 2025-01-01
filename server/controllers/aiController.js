@@ -1,5 +1,7 @@
 const axios = require("axios");
 
+exports.genres = ["Fantasy", "Science-Fiction", "Mystery", "Horror", "Comedy", "Drama", "Thriller", "Rommance"];
+
 exports.generatePrompt = async (req, res) => {
   const { userId, newInput, genre } = req.body;
 
