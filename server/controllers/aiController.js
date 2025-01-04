@@ -1,11 +1,15 @@
 const axios = require("axios");
 
-exports.genres = ["Fantasy", "Science-Fiction", "Mystery", "Horror", "Comedy", "Drama", "Thriller", "Rommance"];
+// Store story sessions in memory (consider using Redis/DB for production)
+const storySessions = new Map();
+
+exports.genres = ["Fantasy", "Science-Fiction", "Mystery", "Horror", "Comedy", "Drama", "Thriller", "Romance"];
 
 exports.generatePrompt = async (req, res) => {
   const { userId, newInput, genre } = req.body;
+  const wordLimit = 50;
 
-  // Validate input
+  // Input validation
   if (!userId || !newInput || !genre) {
     return res.status(400).json({
       success: false,
@@ -13,7 +17,7 @@ exports.generatePrompt = async (req, res) => {
     });
   }
 
-  if (!this.genres.includes(genre)) {
+  if (!exports.genres.includes(genre)) {
     return res.status(400).json({
       success: false,
       message: "Invalid genre or not available",
@@ -21,31 +25,22 @@ exports.generatePrompt = async (req, res) => {
   }
 
   const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent";
-  const API_KEY = process.env.GEMINI_API_KEY; // Ensure this is properly set in your environment variables
+  const API_KEY = process.env.GEMINI_API_KEY;
 
   try {
     // Initialize or continue story session
-    if (!storySessions[userId]) {
-      storySessions[userId] = newInput;
-    } else {
-      storySessions[userId] += ` ${newInput}`;
-    }
-
-    const currentStory = storySessions[userId];
+    let currentStory = storySessions.get(userId) || '';
+    currentStory = currentStory ? `${currentStory} ${newInput}` : newInput;
 
     // Make the Gemini API request
     const response = await axios.post(
       `${API_URL}?key=${API_KEY}`,
       {
-        contents: [
-          {
-            parts: [
-              {
-                text: `Continue this ${genre} story: ${currentStory} within a ${wordLimit}-word limit. Use Indian names and inspirations with simple language.`,
-              },
-            ],
-          },
-        ],
+        contents: [{
+          parts: [{
+            text: `Continue this ${genre} story: ${currentStory} within a ${wordLimit}-word limit. Use Indian names and inspirations with simple language.`,
+          }],
+        }],
       },
       {
         headers: {
@@ -55,15 +50,15 @@ exports.generatePrompt = async (req, res) => {
     );
 
     // Extract generated content
-    const generatedContent =
-      response.data?.candidates?.[0]?.content?.parts?.[0]?.text || "No content generated.";
+    const generatedContent = response.data?.candidates?.[0]?.content?.parts?.[0]?.text || "No content generated.";
 
     // Update the story session
-    storySessions[userId] += ` ${generatedContent}`;
+    currentStory = `${currentStory} ${generatedContent}`;
+    storySessions.set(userId, currentStory);
 
     return res.status(200).json({
       success: true,
-      story: storySessions[userId],
+      story: currentStory,
       prompt: generatedContent,
     });
   } catch (error) {
@@ -73,5 +68,15 @@ exports.generatePrompt = async (req, res) => {
       message: "Error generating prompt",
       details: error.message,
     });
+  }
+};
+
+// Add a cleanup function to remove old sessions (optional)
+exports.cleanupSessions = (maxAge = 24 * 60 * 60 * 1000) => {
+  const now = Date.now();
+  for (const [userId, session] of storySessions.entries()) {
+    if (now - session.timestamp > maxAge) {
+      storySessions.delete(userId);
+    }
   }
 };

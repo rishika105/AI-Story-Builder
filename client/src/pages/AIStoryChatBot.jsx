@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
 import { useSelector } from "react-redux";
 import { genPrompt } from "../services/operations/aiAPI";
@@ -6,79 +6,108 @@ import { FaCircleArrowUp } from "react-icons/fa6";
 
 const AIStoryChatBot = () => {
   const [message, setMessage] = useState("");
-  const {token} = useSelector((state) => state.auth);
-  const genre = useSelector((state) => state.genre);
-  const {userId} = useSelector((state => state.auth));
-  const textareaRef = useRef(null); // Reference for the textarea
-
-  // Adjust the height dynamically based on content
-  const handleInput = (e) => {
-    e.target.style.height = "60px"; // Reset to initial height
-    e.target.style.height = `${e.target.scrollHeight}px`; // Adjust height based on content
-    setMessage(e.target.value); // Update message state
-  };
-
   const [messages, setMessages] = useState([
-    { text: "Welcome to the chat!", isBot: true },
+    { text: "Welcome to the chat!", isBot: true }
   ]);
+  const { token, userId } = useSelector((state) => state.auth);
+  const genre = useSelector((state) => state.genre);
+  const textareaRef = useRef(null);
+  const chatContainerRef = useRef(null);
 
+  // Scroll to bottom when messages update
+  useEffect(() => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    }
+  }, [messages]);
+
+  const handleInput = (e) => {
+    const textarea = e.target;
+    textarea.style.height = "60px";
+    textarea.style.height = `${Math.min(textarea.scrollHeight, 200)}px`;
+    setMessage(e.target.value);
+  };
 
   const handleSend = async () => {
-    
     if (message.trim() === "") return;
 
+    // Add user message
     const userMessage = { text: message, isBot: false };
-    setMessages([...messages, userMessage]);
+    setMessages(prev => [...prev, userMessage]);
     setMessage("");
 
-     // Reset the textarea size to its original height
-     if (textareaRef.current) {
+    // Reset textarea height
+    if (textareaRef.current) {
       textareaRef.current.style.height = "60px";
     }
-    console.log("GENRE", genre.genre)
 
-    const response = await genPrompt(userId, message, genre.genre, token);
-
-    if (response) {
-      const botMessage = { text: response.story, isBot: true };
-      setMessages((prevMessages) => [...prevMessages, userMessage, botMessage]);
+    try {
+      // Generate response
+      const response = await genPrompt(userId, message, genre.genre, token);
+      
+      if (response?.success) {
+        const botMessage = { text: response.story, isBot: true };
+        setMessages(prev => [...prev, botMessage]);
+      } else {
+        throw new Error(response?.message || "Failed to generate story");
+      }
+    } catch (error) {
+      console.error("Story generation error:", error);
+      const errorMessage = { 
+        text: "Sorry, I couldn't generate the story. Please try again.", 
+        isBot: true 
+      };
+      setMessages(prev => [...prev, errorMessage]);
     }
   };
+
   const handleKeyDown = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault(); // Prevent new line
-      handleSend(); // Trigger the send function
+      e.preventDefault();
+      handleSend();
     }
   };
+
   return (
     <>
       <Navbar />
       <div className="bg-deepblue-800 flex flex-col justify-between mx-auto w-[70%] h-[560px] p-4">
-        {/* Chat section */}
-        <div className="overflow-y-scroll space-y-4 h-full scrollbar-hide">
+        <div 
+          ref={chatContainerRef}
+          className="overflow-y-auto space-y-4 h-full scrollbar-hide mb-4"
+        >
           {messages.map((msg, index) => (
-            <p
+            <div
               key={index}
-              className={`text-white ${msg.isBot ? "text-left" : "text-right"}`}
+              className={`max-w-[80%] ${
+                msg.isBot ? "ml-0" : "ml-auto"
+              }`}
             >
-              {msg.text}
-            </p>
+              <p className={`text-white p-3 rounded-lg ${
+                msg.isBot 
+                  ? "bg-darkgray-400 bg-opacity-20" 
+                  : "bg-blue-600"
+              }`}>
+                {msg.text}
+              </p>
+            </div>
           ))}
         </div>
 
-        {/* Send message */}
-        <div className="flex">
+        <div className="flex relative">
           <textarea
-            ref={textareaRef} 
-            className="bg-darkgray-400 bg-opacity-20 h-[60px] w-[80%] mx-auto rounded-2xl p-4 text-white focus:outline-none max-h-[200px] resize-none overflow-y-scroll relative scrollbar-hide mt-4 placeholder:pb-2"
+            ref={textareaRef}
+            className="bg-darkgray-400 bg-opacity-20 h-[60px] w-full mx-auto rounded-2xl p-4 pr-12 text-white focus:outline-none max-h-[200px] resize-none overflow-y-auto scrollbar-hide"
             placeholder="Send message"
             value={message}
             onInput={handleInput}
-            onKeyDown={handleKeyDown} // Listen for keydown events
+            onKeyDown={handleKeyDown}
           />
-          <button className="absolute right-80 mt-8 p-1 pr-2 " type="submit" onClick={handleSend}>
-            {" "}
-            <FaCircleArrowUp className="text-2xl rounded-full text-darkgray-50 cursor-pointer" />
+          <button 
+            className="absolute right-4 top-1/2 -translate-y-1/2"
+            onClick={handleSend}
+          >
+            <FaCircleArrowUp className="text-2xl text-darkgray-50 hover:text-white transition-colors" />
           </button>
         </div>
       </div>
