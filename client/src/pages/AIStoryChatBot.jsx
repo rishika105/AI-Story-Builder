@@ -1,3 +1,4 @@
+// AIStoryChatBot.js
 import React, { useRef, useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
 import { useSelector } from "react-redux";
@@ -6,13 +7,32 @@ import { FaCircleArrowUp } from "react-icons/fa6";
 
 const AIStoryChatBot = () => {
   const [message, setMessage] = useState("");
-  const [messages, setMessages] = useState([
-    { text: "Welcome to the chat!", isBot: true }
-  ]);
+ 
+  const [sessionId, setSessionId] = useState(() => {
+    return localStorage.getItem('currentSessionId') || `session_${Date.now()}`;
+  });
+
   const { token, userId } = useSelector((state) => state.auth);
   const genre = useSelector((state) => state.genre);
   const textareaRef = useRef(null);
   const chatContainerRef = useRef(null);
+
+  const [messages, setMessages] = useState(() => {
+    // Load messages from localStorage on component mount
+    const savedMessages = localStorage.getItem(`chat_${userId}`);
+    return savedMessages 
+      ? JSON.parse(savedMessages) 
+      : [{ text: "Welcome to the chat!", isBot: true }];
+  });
+  
+
+  // Save messages to localStorage whenever they change
+  useEffect(() => {
+    if (userId) {
+      localStorage.setItem(`chat_${userId}`, JSON.stringify(messages));
+      localStorage.setItem('currentSessionId', sessionId);
+    }
+  }, [messages, userId, sessionId]);
 
   // Scroll to bottom when messages update
   useEffect(() => {
@@ -28,11 +48,37 @@ const AIStoryChatBot = () => {
     setMessage(e.target.value);
   };
 
+  const createNewSession = () => {
+    const newSessionId = `session_${Date.now()}`;
+    setSessionId(newSessionId);
+    
+    // Save current session to session history
+    const sessionHistory = JSON.parse(localStorage.getItem(`sessionHistory_${userId}`) || '{}');
+    sessionHistory[sessionId] = messages;
+    localStorage.setItem(`sessionHistory_${userId}`, JSON.stringify(sessionHistory));
+    
+    // Start new session
+    setMessages([{ text: "Welcome to the chat!", isBot: true }]);
+  };
+
+  const loadSession = (targetSessionId) => {
+    const sessionHistory = JSON.parse(localStorage.getItem(`sessionHistory_${userId}`) || '{}');
+    if (sessionHistory[targetSessionId]) {
+      setSessionId(targetSessionId);
+      setMessages(sessionHistory[targetSessionId]);
+    }
+  };
+
   const handleSend = async () => {
     if (message.trim() === "") return;
 
     // Add user message
-    const userMessage = { text: message, isBot: false };
+    const userMessage = { 
+      text: message, 
+      isBot: false,
+      timestamp: Date.now(),
+      sessionId: sessionId
+    };
     setMessages(prev => [...prev, userMessage]);
     setMessage("");
 
@@ -46,7 +92,12 @@ const AIStoryChatBot = () => {
       const response = await genPrompt(userId, message, genre.genre, token);
       
       if (response?.success) {
-        const botMessage = { text: response.story, isBot: true };
+        const botMessage = { 
+          text: response.story, 
+          isBot: true,
+          timestamp: Date.now(),
+          sessionId: sessionId
+        };
         setMessages(prev => [...prev, botMessage]);
       } else {
         throw new Error(response?.message || "Failed to generate story");
@@ -55,7 +106,9 @@ const AIStoryChatBot = () => {
       console.error("Story generation error:", error);
       const errorMessage = { 
         text: "Sorry, I couldn't generate the story. Please try again.", 
-        isBot: true 
+        isBot: true,
+        timestamp: Date.now(),
+        sessionId: sessionId
       };
       setMessages(prev => [...prev, errorMessage]);
     }
@@ -72,6 +125,18 @@ const AIStoryChatBot = () => {
     <>
       <Navbar />
       <div className="bg-deepblue-800 flex flex-col justify-between mx-auto w-[70%] h-[560px] p-4">
+        <div className="flex justify-between mb-4">
+          <button
+            onClick={createNewSession}
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg"
+          >
+            New Chat
+          </button>
+          <span className="text-white opacity-70">
+            Session: {new Date(parseInt(sessionId.split('_')[1])).toLocaleDateString()}
+          </span>
+        </div>
+        
         <div 
           ref={chatContainerRef}
           className="overflow-y-auto space-y-4 h-full scrollbar-hide mb-4"
@@ -90,6 +155,9 @@ const AIStoryChatBot = () => {
               }`}>
                 {msg.text}
               </p>
+              <span className="text-xs text-gray-400 mt-1">
+                {new Date(msg.timestamp).toLocaleTimeString()}
+              </span>
             </div>
           ))}
         </div>

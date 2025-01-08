@@ -6,8 +6,18 @@ const storySessions = new Map();
 exports.genres = ["Fantasy", "Science-Fiction", "Mystery", "Horror", "Comedy", "Drama", "Thriller", "Romance"];
 
 exports.generatePrompt = async (req, res) => {
-  const { userId, newInput, genre } = req.body;
+ 
   const wordLimit = 50;
+
+  const { userId, newInput, genre, sessionId } = req.body;
+  
+  // Use sessionId as part of the story session key
+  const sessionKey = `${userId}_${sessionId}`;
+  let currentStory = storySessions.get(sessionKey) || '';
+  
+  // Rest of your existing code...
+  
+
 
   // Input validation
   if (!userId || !newInput || !genre) {
@@ -54,7 +64,8 @@ exports.generatePrompt = async (req, res) => {
 
     // Update the story session
     currentStory = `${currentStory} ${generatedContent}`;
-    storySessions.set(userId, currentStory);
+     // Update session storage with sessionId
+     storySessions.set(sessionKey, currentStory);
 
     return res.status(200).json({
       success: true,
