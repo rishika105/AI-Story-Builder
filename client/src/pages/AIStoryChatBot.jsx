@@ -4,6 +4,7 @@ import Navbar from "../components/Navbar";
 import { useSelector } from "react-redux";
 import { genPrompt } from "../services/operations/aiAPI";
 import { FaCircleArrowUp } from "react-icons/fa6";
+import Sidebar from "../components/Sidebar"
 
 const AIStoryChatBot = () => {
   const [message, setMessage] = useState("");
@@ -124,17 +125,9 @@ const AIStoryChatBot = () => {
   return (
     <>
       <Navbar />
-      <div className="bg-deepblue-800 flex flex-col justify-between mx-auto w-[70%] h-[560px] p-4">
-        <div className="flex justify-between mb-4">
-          <button
-            onClick={createNewSession}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg"
-          >
-            New Chat
-          </button>
-          <span className="text-white opacity-70">
-            Session: {new Date(parseInt(sessionId.split('_')[1])).toLocaleDateString()}
-          </span>
+      <Sidebar createNewSession= {createNewSession}/>
+      <div className="bg-deepblue-800 flex flex-col justify-between  w-[57%] h-[560px] p-4 ml-[385px]">
+        <div className="flex justify-between mb-4 ">
         </div>
         
         <div 
@@ -145,12 +138,12 @@ const AIStoryChatBot = () => {
             <div
               key={index}
               className={`max-w-[80%] ${
-                msg.isBot ? "ml-0" : "ml-auto"
+                msg.isBot ? "ml-[160px] mt-28" : "ml-auto"
               }`}
             >
               <p className={`text-white p-3 rounded-lg ${
                 msg.isBot 
-                  ? "bg-darkgray-400 bg-opacity-20" 
+                  ? "text-4xl text-opacity-80" 
                   : "bg-blue-600"
               }`}>
                 {msg.text}
