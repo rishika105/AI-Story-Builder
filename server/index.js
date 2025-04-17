@@ -12,7 +12,7 @@ const database = require("./config/database");
 
 // Load environment variables from `.env` file into `process.env`.
 dotenv.config();
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 5000;
 
 //db connect
 database.connect();
@@ -26,10 +26,7 @@ app.use(cookieParser());
 
 //  CORS for requests coming from a specific origin
 app.use(
-  cors({
-    origin: "http://localhost:3000",
-    credentials: true,
-  })
+  cors()
 );
 
 // Defining routes. with mounting defualt
