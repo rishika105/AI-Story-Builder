@@ -1,5 +1,5 @@
 const express = require("express");
-const { generatePrompt, genres } = require("../controllers/AIController");
+const { generatePrompt, genres } = require("../controllers/AIControl");
 const router = express.Router();
 const {auth} = require("../middlewares/auth")
 
