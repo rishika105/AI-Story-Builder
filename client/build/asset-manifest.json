@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/static/css/main.3bf84af1.css",
+    "main.js": "/static/js/main.b17bb253.js",
+    "static/media/8k_earth_clouds.jpg": "/static/media/8k_earth_clouds.08fcd80007fae8fc7170.jpg",
+    "static/media/8k_earth_daymap.jpg": "/static/media/8k_earth_daymap.54672c1f3ba121d80470.jpg",
+    "static/media/8k_earth_specular_map.jpg": "/static/media/8k_earth_specular_map.7b4efa59933b470e3776.jpg",
+    "static/media/8k_earth_normal_map.jpg": "/static/media/8k_earth_normal_map.930cf2e99bc548140c29.jpg",
+    "index.html": "/index.html"
+  },
+  "entrypoints": [
+    "static/css/main.3bf84af1.css",
+    "static/js/main.b17bb253.js"
+  ]
+}
