@@ -29,8 +29,10 @@ export const getGenres = async (token) => {
   }
 }
 // Update the front-end API connector function
-export const genPrompt = async (userId, newInput, genre, token, conversationHistory = "", sessionId = "") => {
-  const toastId = toast.loading("Writing the next part of your story...");
+
+// Update the front-end API connector function
+export const genPrompt = async (userId, newInput, genre, token, fullStoryContext = "", sessionId = "") => {
+  const toastId = toast.loading("Writing...");
   try {
     const response = await apiConnector(
       "POST",
@@ -39,7 +41,7 @@ export const genPrompt = async (userId, newInput, genre, token, conversationHist
         userId, 
         newInput, 
         genre, 
-        conversationHistory, 
+        fullStoryContext, 
         sessionId 
       },
       {
@@ -51,14 +53,13 @@ export const genPrompt = async (userId, newInput, genre, token, conversationHist
       throw new Error(response.data.message || "Story generation failed");
     }
     
-    toast.success("Story continued!");
+    toast.success("Story continued");
     return response.data;
   } catch (error) {
-    console.error("Error generating story prompt:", error);
-    toast.error(error.message || "Failed to continue your story");
+    console.error("Error generating story:", error);
+    toast.error(error.message || "Failed to continue story");
     return null;
   } finally {
     toast.dismiss(toastId);
   }
 };
-

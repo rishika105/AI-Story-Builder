@@ -6,8 +6,8 @@ const storySessions = new Map();
 exports.genres = ["Fantasy", "Science-Fiction", "Mystery", "Horror", "Comedy", "Drama", "Thriller", "Romance"];
 // Backend controller function
 exports.generatePrompt = async (req, res) => {
-  const wordLimit = 150; // Increased word limit for better storytelling
-  const { userId, newInput, genre, conversationHistory, sessionId } = req.body;
+  const MAX_CONTENT_LENGTH = 100; // Shorter responses
+  const { userId, newInput, genre, fullStoryContext, sessionId } = req.body;
   
   // Use sessionId as part of the story session key
   const sessionKey = `${userId}_${sessionId}`;
@@ -33,7 +33,7 @@ exports.generatePrompt = async (req, res) => {
   try {
     // Get or initialize the session data
     let sessionData = storySessions.get(sessionKey) || {
-      story: '',
+      fullContext: fullStoryContext || newInput,
       messages: [],
       lastUpdate: Date.now()
     };
@@ -45,22 +45,8 @@ exports.generatePrompt = async (req, res) => {
       timestamp: Date.now()
     });
     
-    // Build prompt with context but without duplicating content
-    let promptContext = '';
-    
-    // If we have conversation history, use that for context
-    if (conversationHistory) {
-      promptContext = conversationHistory;
-    } else if (sessionData.messages.length > 1) {
-      // Otherwise use last few messages as context
-      promptContext = sessionData.messages
-        .slice(-4)
-        .map(msg => msg.content)
-        .join("\n");
-    } else {
-      // For first message, just use the input
-      promptContext = newInput;
-    }
+    // If we have full context, use that; otherwise use only input
+    const promptContext = fullStoryContext || newInput;
     
     // Make the Gemini API request with improved prompt
     const response = await axios.post(
@@ -68,15 +54,27 @@ exports.generatePrompt = async (req, res) => {
       {
         contents: [{
           parts: [{
-            text: `You are a creative storyteller continuing an interactive ${genre} story. 
-            
-            Context so far: ${promptContext}
-            
-            Continue this ${genre} story by adding another segment (${wordLimit} words max). 
-            Make it engaging and imaginative with a mix of dialogue and description. 
-            Use simple but vivid language. Include Indian cultural elements when appropriate`,
+            text: `You are continuing an interactive ${genre} story. Your job is to write the next part based on the user's input.
+
+Full story context so far: 
+${promptContext}
+
+User's latest input: ${newInput}
+
+Write a direct continuation (${MAX_CONTENT_LENGTH} words maximum) that picks up exactly where the story left off.
+Use simple but vivid language with some Indian cultural elements when appropriate.
+Keep your response short and focused.
+DO NOT repeat what has already been written.
+DO NOT summarize the story so far.
+Just continue the narrative naturally as if you're the next writer in a collaborative storytelling session.`,
           }],
         }],
+        generationConfig: {
+          maxOutputTokens: 200,  // Limit the response length
+          temperature: 0.7,      // More focused responses
+          topP: 0.8,             // More focused responses
+          topK: 40               // More deterministic
+        }
       },
       {
         headers: {
@@ -88,17 +86,22 @@ exports.generatePrompt = async (req, res) => {
     // Extract generated content
     const generatedContent = response.data?.candidates?.[0]?.content?.parts?.[0]?.text || "No content generated.";
     
+    // Clean up the response to remove any unwanted prefixes/suffixes
+    const cleanedContent = generatedContent
+      .replace(/^(As the story continues:|Continuing the story:|Here's what happens next:|The story continues:)/i, '')
+      .trim();
+    
     // Add AI response to session messages
     sessionData.messages.push({
       role: 'assistant',
-      content: generatedContent,
+      content: cleanedContent,
       timestamp: Date.now()
     });
     
-    // Update the complete story (for the copy full story feature)
-    sessionData.story = sessionData.story 
-      ? `${sessionData.story}\n\n${generatedContent}` 
-      : generatedContent;
+    // Update the complete story context
+    sessionData.fullContext = fullStoryContext 
+      ? `${fullStoryContext}\n${newInput}\n${cleanedContent}`
+      : `${newInput}\n${cleanedContent}`;
     
     // Update lastUpdate timestamp
     sessionData.lastUpdate = Date.now();
@@ -108,18 +111,19 @@ exports.generatePrompt = async (req, res) => {
     
     return res.status(200).json({
       success: true,
-      story: sessionData.story, // Full story for context
-      prompt: generatedContent, // Just the new content
+      story: sessionData.fullContext, // Full story for context
+      prompt: cleanedContent, // Just the new content
     });
   } catch (error) {
     console.error("Error from Gemini API:", error.response?.data || error.message);
     return res.status(500).json({
       success: false,
-      message: "Error generating prompt",
+      message: "Error generating story content",
       details: error.message,
     });
   }
 };
+
 // Add an endpoint to handle story sharing
 exports.getSharedStory = async (req, res) => {
   const { shareId } = req.params;
@@ -162,12 +166,14 @@ exports.getSharedStory = async (req, res) => {
 
 
 // Add session cleanup to avoid memory issues
+const SESSION_EXPIRY = 60 * 24 * 60 * 60 * 1000; // 60 days in milliseconds
+
+// Add session cleanup to avoid memory issues
 setInterval(() => {
-  const MAX_SESSION_AGE = 7 * 24 * 60 * 60 * 1000; // 7 days in milliseconds
   const now = Date.now();
   
   for (const [key, session] of storySessions.entries()) {
-    if (now - session.lastUpdate > MAX_SESSION_AGE) {
+    if (now - session.lastUpdate > SESSION_EXPIRY) {
       storySessions.delete(key);
     }
   }

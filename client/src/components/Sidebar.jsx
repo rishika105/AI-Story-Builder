@@ -1,5 +1,5 @@
 import React from "react";
-import { FaPlus, FaHistory, FaTimes, FaPen } from "react-icons/fa";
+import { FaPlus, FaHistory, FaPen } from "react-icons/fa";
 
 const Sidebar = ({ createNewSession, loadSession, sessions, currentSessionId }) => {
   const [showSessions, setShowSessions] = React.useState(true);
@@ -13,9 +13,7 @@ const Sidebar = ({ createNewSession, loadSession, sessions, currentSessionId }) 
 
   const handleEditSave = () => {
     if (editTitle.trim()) {
-      // In a real implementation, you'd update the title in localStorage
       localStorage.setItem(`title_${editingId}`, editTitle);
-      // Update the session list UI (would be handled by parent component in real app)
     }
     setEditingId(null);
   };
@@ -34,11 +32,11 @@ const Sidebar = ({ createNewSession, loadSession, sessions, currentSessionId }) 
   };
 
   return (
-    <div className="fixed left-0 top-16 h-full w-80 bg-deepblue-900 p-4 overflow-y-auto">
+    <div className="fixed left-0 top-16 h-full w-80 bg-blue-900 p-4 overflow-y-auto">
       <div className="mb-6">
         <button
           onClick={createNewSession}
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg flex items-center justify-center transition-colors"
+          className="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-lg flex items-center justify-center transition-colors"
         >
           <FaPlus className="mr-2" /> New Story
         </button>
@@ -59,16 +57,17 @@ const Sidebar = ({ createNewSession, loadSession, sessions, currentSessionId }) 
         {showSessions && (
           <div className="space-y-2 mt-3">
             {sessions.length === 0 ? (
-              <p className="text-gray-400 text-sm italic">No stories yet</p>
+              <p className="text-gray-300 text-sm italic">No stories yet</p>
             ) : (
               sessions.map((session) => (
                 <div
                   key={session.id}
                   className={`py-2 px-3 rounded-lg flex justify-between items-center cursor-pointer ${
                     currentSessionId === session.id
-                      ? "bg-deepblue-700 text-white"
-                      : "text-gray-300 hover:bg-deepblue-800"
+                      ? "bg-blue-600 text-white"
+                      : "text-white hover:bg-blue-700"
                   }`}
+                  onClick={() => loadSession(session.id)}
                 >
                   {editingId === session.id ? (
                     <input
@@ -77,13 +76,13 @@ const Sidebar = ({ createNewSession, loadSession, sessions, currentSessionId }) 
                       onChange={(e) => setEditTitle(e.target.value)}
                       onBlur={handleEditSave}
                       onKeyDown={handleKeyDown}
-                      className="bg-deepblue-600 text-white p-1 rounded w-full mr-2"
+                      className="bg-blue-800 text-white p-1 rounded w-full mr-2"
                       autoFocus
+                      onClick={(e) => e.stopPropagation()}
                     />
                   ) : (
                     <div
                       className="flex-1 overflow-hidden text-ellipsis whitespace-nowrap"
-                      onClick={() => loadSession(session.id)}
                     >
                       {session.title}
                     </div>
@@ -96,7 +95,7 @@ const Sidebar = ({ createNewSession, loadSession, sessions, currentSessionId }) 
                           e.stopPropagation();
                           handleEditStart(session);
                         }}
-                        className="text-gray-400 hover:text-white"
+                        className="text-gray-300 hover:text-white"
                       >
                         <FaPen size={12} />
                       </button>

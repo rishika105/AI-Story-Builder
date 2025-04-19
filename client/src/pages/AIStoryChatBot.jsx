@@ -12,6 +12,7 @@ const AIStoryChatBot = () => {
   const [sessions, setSessions] = useState([]);
   const [shareLink, setShareLink] = useState("");
   const [showShareModal, setShowShareModal] = useState(false);
+  const [fullStoryContext, setFullStoryContext] = useState("");
  
   const [sessionId, setSessionId] = useState(() => {
     return localStorage.getItem('currentSessionId') || `session_${Date.now()}`;
@@ -33,13 +34,23 @@ const AIStoryChatBot = () => {
     return savedMessages 
       ? JSON.parse(savedMessages) 
       : [{ 
-          text: `Welcome to your ${genre.genre || 'Story'} adventure! What would you like to write about today?`, 
+          text: `I'll help you create a ${genre.genre || 'story'}. What would you like to write about?`, 
           isBot: true,
           timestamp: Date.now(),
           sessionId: sessionId
         }];
   });
   
+  // Load full story context
+  useEffect(() => {
+    const storyContext = localStorage.getItem(`story_context_${sessionId}`);
+    if (storyContext) {
+      setFullStoryContext(storyContext);
+    } else {
+      setFullStoryContext("");
+    }
+  }, [sessionId]);
+
   // Load session list
   useEffect(() => {
     if (userId) {
@@ -58,14 +69,21 @@ const AIStoryChatBot = () => {
       localStorage.setItem(`chat_${sessionId}`, JSON.stringify(messages));
       localStorage.setItem('currentSessionId', sessionId);
       
-      // Update session title based on the first user message if not already set
+      // Auto-update session title based on the first user message
       if (sessionTitle === "New Story" && messages.length > 1 && !messages[0].isBot) {
-        const newTitle = messages[0].text.slice(0, 30) + (messages[0].text.length > 30 ? "..." : "");
+        const newTitle = messages[0].text.slice(0, 20) + (messages[0].text.length > 20 ? "..." : "");
         setSessionTitle(newTitle);
         localStorage.setItem(`title_${sessionId}`, newTitle);
       }
     }
   }, [messages, userId, sessionId, sessionTitle]);
+
+  // Save full story context
+  useEffect(() => {
+    if (fullStoryContext && userId) {
+      localStorage.setItem(`story_context_${sessionId}`, fullStoryContext);
+    }
+  }, [fullStoryContext, sessionId, userId]);
 
   // Scroll to bottom when messages update
   useEffect(() => {
@@ -85,6 +103,7 @@ const AIStoryChatBot = () => {
     const newSessionId = `session_${Date.now()}`;
     setSessionId(newSessionId);
     setSessionTitle("New Story");
+    setFullStoryContext("");
     localStorage.setItem(`title_${newSessionId}`, "New Story");
     
     // Save current session to session history
@@ -94,7 +113,7 @@ const AIStoryChatBot = () => {
     
     // Start new session
     setMessages([{ 
-      text: `Welcome to your ${genre.genre || 'Story'} adventure! What would you like to write about today?`, 
+      text: `I'll help you create a ${genre.genre || 'story'}. What would you like to write about?`, 
       isBot: true,
       timestamp: Date.now(),
       sessionId: newSessionId
@@ -110,9 +129,12 @@ const AIStoryChatBot = () => {
       setSessionId(targetSessionId);
       setMessages(sessionHistory[targetSessionId]);
       
-      // Load session title
+      // Load session title and context
       const title = localStorage.getItem(`title_${targetSessionId}`) || "Untitled Story";
       setSessionTitle(title);
+      
+      const storyContext = localStorage.getItem(`story_context_${targetSessionId}`);
+      setFullStoryContext(storyContext || "");
     }
   };
 
@@ -147,28 +169,32 @@ const AIStoryChatBot = () => {
     }
 
     try {
-      // Extract conversation history for context without full repetition
-      const conversationHistory = messages
-        .filter(msg => msg.sessionId === sessionId)
-        .slice(-6) // Use last 6 messages for context
-        .map(msg => msg.text)
-        .join("\n");
+      // Use full story context for better continuity
+      const contextToSend = fullStoryContext || message;
       
       // Generate response
-      const response = await genPrompt(userId, message, genre.genre, token, conversationHistory, sessionId);
+      const response = await genPrompt(userId, message, genre.genre, token, contextToSend, sessionId);
       
       if (response?.success) {
         const botMessage = { 
-          text: response.prompt, // Using prompt which has only the new content
+          text: response.prompt, // New content only
           isBot: true,
           timestamp: Date.now(),
           sessionId: sessionId
         };
+        
         setMessages(prev => [...prev, botMessage]);
         
-        // Update session title if it's a new conversation
+        // Update full story context with new content
+        const updatedContext = fullStoryContext 
+          ? `${fullStoryContext}\n${message}\n${response.prompt}`
+          : `${message}\n${response.prompt}`;
+        
+        setFullStoryContext(updatedContext);
+        
+        // Auto-name the session based on first message if it's new
         if (messages.length <= 2 && sessionTitle === "New Story") {
-          const newTitle = message.slice(0, 30) + (message.length > 30 ? "..." : "");
+          const newTitle = message.slice(0, 20) + (message.length > 20 ? "..." : "");
           updateSessionTitle(newTitle);
         }
       } else {
@@ -197,13 +223,8 @@ const AIStoryChatBot = () => {
 
   // Function to copy the full story to clipboard
   const copyFullStory = () => {
-    const storyText = messages
-      .filter(msg => msg.sessionId === sessionId && msg.isBot)
-      .map(msg => msg.text)
-      .join("\n\n");
-      
-    navigator.clipboard.writeText(storyText).then(() => {
-      toast.success("Story copied to clipboard!");
+    navigator.clipboard.writeText(fullStoryContext).then(() => {
+      toast.success("Full story copied to clipboard!");
     }).catch(err => {
       toast.error("Failed to copy story");
       console.error("Copy failed: ", err);
@@ -213,7 +234,6 @@ const AIStoryChatBot = () => {
   // Function to generate a shareable link
   const generateShareLink = () => {
     // In a real app, you'd create an API endpoint to save the chat and return a unique URL
-    // For now, we'll simulate it with a local URL and sessionId
     const link = `${window.location.origin}/share/${sessionId}`;
     setShareLink(link);
     setShowShareModal(true);
@@ -237,11 +257,11 @@ const AIStoryChatBot = () => {
         <div className="flex justify-between mb-4">
           <div className="flex items-center">
             <h2 className="text-white text-xl font-semibold">{sessionTitle}</h2>
-            <div className="ml-4 text-darkgray-50">
+            <div className="ml-4 text-white opacity-70">
               <button 
                 onClick={copyFullStory} 
                 className="mr-3 hover:text-white transition-colors tooltip"
-                data-tooltip="Copy story"
+                data-tooltip="Copy full story"
               >
                 <FaRegCopy className="text-xl" />
               </button>
@@ -267,19 +287,15 @@ const AIStoryChatBot = () => {
             <div
               key={index}
               className={`${
-                msg.isBot ? "max-w-[85%]" : "max-w-[75%] ml-auto"
+                msg.isBot ? "max-w-[80%]" : "max-w-[70%] ml-auto"
               }`}
             >
               <div className={`p-3 rounded-lg ${
                 msg.isBot 
-                  ? "bg-deepblue-700 text-white" 
-                  : "bg-blue-600 text-white"
+                  ? "bg-blue-700 text-white" 
+                  : "bg-blue-500 text-white"
               }`}>
-                <p className={`${
-                  msg.isBot 
-                    ? "text-lg leading-relaxed" 
-                    : "text-md"
-                }`}>
+                <p className={`${msg.isBot ? "text-base" : "text-sm"}`}>
                   {msg.text}
                 </p>
               </div>
@@ -302,12 +318,12 @@ const AIStoryChatBot = () => {
             </div>
           ))}
           {isGenerating && (
-            <div className="max-w-[85%]">
-              <div className="bg-deepblue-700 text-white p-3 rounded-lg">
+            <div className="max-w-[80%]">
+              <div className="bg-blue-700 text-white p-3 rounded-lg">
                 <div className="flex space-x-2">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-                  <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse delay-75"></div>
-                  <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse delay-150"></div>
+                  <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                  <div className="w-2 h-2 bg-white rounded-full animate-pulse delay-75"></div>
+                  <div className="w-2 h-2 bg-white rounded-full animate-pulse delay-150"></div>
                 </div>
               </div>
             </div>
@@ -317,7 +333,7 @@ const AIStoryChatBot = () => {
         <div className="flex relative">
           <textarea
             ref={textareaRef}
-            className="bg-darkgray-400 bg-opacity-20 h-[60px] w-full mx-auto rounded-2xl p-4 pr-12 text-white focus:outline-none max-h-[200px] resize-none overflow-y-auto scrollbar-hide"
+            className="bg-deepblue-600 h-[60px] w-full mx-auto rounded-2xl p-4 pr-12 text-white focus:outline-none max-h-[200px] resize-none overflow-y-auto scrollbar-hide"
             placeholder={isGenerating ? "Generating story..." : "Continue the story..."}
             value={message}
             onInput={handleInput}
@@ -331,7 +347,7 @@ const AIStoryChatBot = () => {
             onClick={handleSend}
             disabled={isGenerating || !message.trim()}
           >
-            <FaCircleArrowUp className="text-2xl text-darkgray-50 transition-colors" />
+            <FaCircleArrowUp className="text-2xl text-white transition-colors" />
           </button>
         </div>
       </div>
@@ -339,14 +355,14 @@ const AIStoryChatBot = () => {
       {/* Share Modal */}
       {showShareModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-deepblue-700 p-6 rounded-lg w-96">
+          <div className="bg-blue-800 p-6 rounded-lg w-96">
             <h3 className="text-white text-xl mb-4">Share Your Story</h3>
             <div className="flex mb-4">
               <input 
                 type="text" 
                 value={shareLink} 
                 readOnly 
-                className="bg-deepblue-800 text-white p-2 rounded-l-lg w-full"
+                className="bg-blue-900 text-white p-2 rounded-l-lg w-full"
               />
               <button 
                 onClick={() => {
@@ -361,7 +377,7 @@ const AIStoryChatBot = () => {
             <div className="flex justify-end">
               <button 
                 onClick={closeShareModal}
-                className="bg-darkgray-400 text-white py-2 px-4 rounded-lg"
+                className="bg-blue-700 text-white py-2 px-4 rounded-lg"
               >
                 Close
               </button>
@@ -370,7 +386,6 @@ const AIStoryChatBot = () => {
         </div>
       )}
 
-      {/* Add some simple CSS for tooltips */}
       <style jsx>{`
         .tooltip {
           position: relative;
